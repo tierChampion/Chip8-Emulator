@@ -10,13 +10,17 @@ namespace ch8 {
 	*/
 	class Audio {
 
-		float				_time;				// Timing counter
-		const float			_frequency = 440;	// Frequency of the sound
+		static constexpr float	_AMPLITUDE = 40000;
+		static constexpr int	_SAMPLING_FREQ = 48000;
 
-		SDL_AudioDeviceID	_deviceId;			// Audio device in use
-		SDL_AudioSpec		_spec, _aspec;		// Specifications of the audio device
+
+		SDL_AudioDeviceID		_deviceId;			// Audio device in use
+		SDL_AudioSpec			_spec, _aspec;		// Specifications of the audio device
 
 	public:
+
+		static float			_time;				// Timing counter
+		static constexpr float			_frequency = 440;	// Frequency of the sound
 
 		Audio();
 

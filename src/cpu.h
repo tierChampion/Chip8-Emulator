@@ -3,10 +3,11 @@
 #include <cinttypes>
 #include "keyboard.h"
 #include "renderer.h"
+#include "audio.h"
 
 namespace ch8 {
 
-#define CHIP8_CLOCK_SPEED 300 // Hz
+#define CHIP8_CLOCK_SPEED 200 // Hz
 #define CHIP8_TICKS_PER_FRAME (int)((1.0f / CHIP8_CLOCK_SPEED) * 1000) // Ticks or ms
 
 	/*
@@ -41,7 +42,7 @@ namespace ch8 {
 
 		Keyboard	_inputs;			// Input module
 		Renderer	_visuals;			// Visual module
-		// Audio
+		Audio		_audio;				// Audio module
 
 		Cpu();
 

@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\audio.cpp" />
     <ClCompile Include="src\cpu.cpp" />
     <ClCompile Include="src\emulator.cpp" />
     <ClCompile Include="src\keyboard.cpp" />

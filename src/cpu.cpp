@@ -499,19 +499,17 @@ namespace ch8 {
 
 		}
 
-		// Update the delay timer
+		// Update the timers
 		if (_delay_timer > 0) _delay_timer--;
+		if (_audio_timer > 0) _audio_timer--;
 
 		// Update the audio timer
 		if (_audio_timer > 0) {
-			if (_audio_timer == 1) {
-				// TODO
-				std::cout << "BEEP!" << std::endl;
-			}
-
-			_audio_timer--;
+			std::cout << +_audio_timer << std::endl;
+			_audio.playFrequency(440);
 		}
-
+		else if (_audio_timer == 0) {
+			_audio.stop();
+		}
 	}
-
 }
