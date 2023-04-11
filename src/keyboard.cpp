@@ -5,21 +5,22 @@ namespace ch8 {
 
 	Keyboard::Keyboard() {
 
-		_awaited_key = 0x0;
+		_awaited_key = 0x00;
 		_waiting = false;
 
-		for (int i = 0; i < 16; i++) {
-			_keys[i] = 0x0;
+		for (int i = 0; i < CHIP8_KEY_COUNT; i++) {
+			_keys[i] = 0x00;
 		}
 	}
 
 
+	/**
+	* Event for the pressing.
+	* @param event - SDL key event
+	*/
 	void Keyboard::onKeyDown(SDL_KeyboardEvent* event) {
 
 		// Check if it is a repeat key
-
-		std::cout << "wow" << std::endl;
-
 		if (event->repeat != 0)
 			return;
 
@@ -28,7 +29,7 @@ namespace ch8 {
 		// Check if the input is valid
 		if (pair != _KEY_MAP.end()) {
 
-			_keys[pair->second] = 0xF;
+			_keys[pair->second] = 0xFF;
 
 			if (_waiting) {
 				_awaited_key = pair->second;
@@ -37,6 +38,10 @@ namespace ch8 {
 		}
 	}
 
+	/**
+	* Event for the releasing.
+	* @param event - SDL key event
+	*/
 	void Keyboard::onKeyUp(SDL_KeyboardEvent* event) {
 
 		auto pair = _KEY_MAP.find(event->keysym.scancode);
@@ -44,7 +49,7 @@ namespace ch8 {
 		// Check if the input is valid
 		if (pair != _KEY_MAP.end()) {
 
-			_keys[pair->second] = 0x0;
+			_keys[pair->second] = 0x00;
 		}
 	}
 
@@ -60,11 +65,16 @@ namespace ch8 {
 		_waiting = true;
 	}
 
+	/**
+	* Operator to print the key states.
+	* @param os - Stream to print to
+	* @param kb - Keyboard to print
+	*/
 	std::ostream& operator<<(std::ostream& os, const Keyboard& kb) {
 		os << "[ ";
 
 		for (uint8_t key : kb._keys) {
-			os << key % 14 << " ";
+			os << ((key > 0x00) ? 1 : 0) << " ";
 		}
 
 		return os << "]\n";

@@ -7,6 +7,8 @@
 
 namespace ch8 {
 
+#define CHIP8_KEY_COUNT 16
+
 	// Mapping from Keyboard key to Chip8 keyboard
 	const static std::map<SDL_Scancode, uint8_t> _KEY_MAP = {
 			{SDL_SCANCODE_1, 0x1 },		// 1 -> 1
@@ -32,7 +34,7 @@ namespace ch8 {
 	*/
 	class Keyboard {
 
-		uint8_t		_keys[16];		// States of the keys
+		uint8_t		_keys[CHIP8_KEY_COUNT];		// States of the keys
 		uint8_t		_awaited_key;	// Index of the first inputed key after waiting
 		bool		_waiting;		// State if waiting for a key press
 

@@ -3,6 +3,7 @@
 
 #include "cpu.h"
 #include "keyboard.h"
+#include "renderer.h"
 
 using namespace ch8;
 
@@ -14,15 +15,13 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	SDL_Window* window = SDL_CreateWindow("Chip8 emulator", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1080, 720, 0);
-
 	Cpu cpu;
 
 	bool res = cpu.loadProgram("roms/PONG");
 
 	if (!res) return -1;
 
-	cpu.test_cycle(0xC000);
+	Renderer r(0);
 
 	Keyboard k;
 
@@ -40,6 +39,9 @@ int main(int argc, char* argv[]) {
 			default: break;
 			}
 		}
+
+		if (k.isPressed(0x0)) std::cout << (r.setPixel(0, 0)) << std::endl;
+		r.render();
 	}
 
 	//// Game Loop ////
@@ -53,8 +55,6 @@ int main(int argc, char* argv[]) {
 		// emulate a cycle
 		// render if needed
 		// store key press
-
-	SDL_DestroyWindow(window);
 
 	SDL_Quit();
 
