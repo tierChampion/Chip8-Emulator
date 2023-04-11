@@ -69,8 +69,8 @@ namespace ch8 {
 
 		// Ensure a 60 Hz clock speed for the timers
 		uint32_t current_time = SDL_GetTicks();
-		if (current_time - _frame_start < CHIP8_CLOCK_SPEED) {
-			SDL_Delay(CHIP8_CLOCK_SPEED - (current_time - _frame_start));
+		if (current_time - _frame_start < CHIP8_TICKS_PER_FRAME) {
+			SDL_Delay(CHIP8_TICKS_PER_FRAME - (current_time - _frame_start));
 		}
 
 		_frame_start = SDL_GetTicks();
@@ -325,6 +325,8 @@ namespace ch8 {
 		}
 
 		case 0xD000: { // Draw a sprite at a specific location
+
+			_V[0xF] = 0;
 
 			for (int i = 0; i < _n(); i++) {
 

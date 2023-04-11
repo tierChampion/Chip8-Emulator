@@ -14,11 +14,11 @@ namespace ch8 {
 	*/
 	class Renderer {
 
-		uint8_t			_screen[CHIP8_SCREEN_W * CHIP8_SCREEN_H];	// Screen raster
+		uint8_t*		_screen;		// Screen raster
 
-		SDL_Renderer*	_renderer;									// Rendering object
-		SDL_Window*		_window;									// Window object
-		SDL_Texture*	_texture;									// Screen texture to render
+		SDL_Renderer*	_renderer;		// Rendering object
+		SDL_Window*		_window;		// Window object
+		SDL_Texture*	_texture;		// Screen texture to render
 
 	public:
 
