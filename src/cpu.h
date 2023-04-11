@@ -1,8 +1,12 @@
 #pragma once
 
 #include <cinttypes>
+#include "keyboard.h"
+#include "renderer.h"
 
 namespace ch8 {
+
+#define CHIP8_CLOCK_SPEED 16 // Ticks or ms
 
 	/*
 	Central processing unit of the Chip8.
@@ -17,10 +21,12 @@ namespace ch8 {
 		uint16_t	_I;					// Address register
 		uint16_t	_PC;				// Program counter
 
-		bool		_draw_flag = false;	// If the display should be updated
+		bool		_draw_flag = true;	// If the display should be updated
+		bool		_wait_flag = false;	// If the cpu is waiting for an input
 
 		uint8_t		_delay_timer;		// Timer for the events
 		uint8_t		_audio_timer;		// Timer for the audio
+		uint32_t	_frame_start;		// Start of the current frame
 
 		/* Opcode operations */
 
@@ -32,13 +38,17 @@ namespace ch8 {
 
 	public:
 
+		Keyboard	_inputs;			// Input module
+		Renderer	_visuals;			// Visual module
+		// Audio
+
 		Cpu();
 
 		bool loadProgram(const char* rom_path);
 		void cycle();
 
 		void test_cycle(uint16_t opcode);
-		// todo...
+		bool needToDraw();
 	};
 
 	uint8_t Cpu::_x() {

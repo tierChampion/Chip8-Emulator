@@ -2,15 +2,13 @@
 
 namespace ch8 {
 
-	Renderer::Renderer(uint8_t scale) {
+	Renderer::Renderer() {
 
 		_window = SDL_CreateWindow("Chip8 emulator", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 320, 0);
 		_renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
 
 		_texture = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGB332, SDL_TEXTUREACCESS_STREAMING,
 			CHIP8_SCREEN_W, CHIP8_SCREEN_H);
-
-		_frame_start = 0;
 
 		clearScreen();
 	}
@@ -41,7 +39,9 @@ namespace ch8 {
 	bool Renderer::setPixel(uint8_t x, uint8_t y) {
 
 		// Check if within bounds
-		if (y >= CHIP8_SCREEN_H) return false;
+		if ((int)x >= CHIP8_SCREEN_W || (int)y >= CHIP8_SCREEN_H) {
+			return false;
+		}
 
 		// XOR the new pixel
 		_screen[y * CHIP8_SCREEN_W + x] ^= 0xFF;
@@ -57,7 +57,17 @@ namespace ch8 {
 
 		SDL_RenderClear(_renderer);
 
-		SDL_UpdateTexture(_texture, NULL, _screen, CHIP8_SCREEN_W);
+
+		uint8_t* texture_pixels;
+		int pitch;
+
+		SDL_LockTexture(_texture, NULL, (void**)&texture_pixels, &pitch);
+
+		for (int i = 0; i < CHIP8_SCREEN_W * CHIP8_SCREEN_H; i++) {
+			texture_pixels[i] = _screen[i];
+		}
+
+		SDL_UnlockTexture(_texture);
 
 		SDL_RenderCopy(_renderer, _texture, NULL, NULL);
 

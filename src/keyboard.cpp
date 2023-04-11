@@ -61,6 +61,10 @@ namespace ch8 {
 		return _waiting;
 	}
 
+	uint8_t Keyboard::getWaited() const {
+		return _awaited_key;
+	}
+
 	void Keyboard::wait() {
 		_waiting = true;
 	}

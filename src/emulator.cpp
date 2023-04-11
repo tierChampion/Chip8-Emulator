@@ -2,8 +2,6 @@
 #include <iostream>
 
 #include "cpu.h"
-#include "keyboard.h"
-#include "renderer.h"
 
 using namespace ch8;
 
@@ -21,40 +19,28 @@ int main(int argc, char* argv[]) {
 
 	if (!res) return -1;
 
-	Renderer r(0);
-
-	Keyboard k;
-
 	SDL_Event event;
 
 	bool quit = false;
 
 	while (!quit) {
 
+		cpu.cycle();
+
+		if (cpu.needToDraw()) {
+			cpu._visuals.render();
+		}
+
+		// Poll the events
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_QUIT: quit = true; break;
-			case SDL_KEYDOWN: k.onKeyDown(&event.key); break;
-			case SDL_KEYUP: k.onKeyUp(&event.key); break;
+			case SDL_KEYDOWN: cpu._inputs.onKeyDown(&event.key); break;
+			case SDL_KEYUP: cpu._inputs.onKeyUp(&event.key); break;
 			default: break;
 			}
 		}
-
-		if (k.isPressed(0x0)) std::cout << (r.setPixel(0, 0)) << std::endl;
-		r.render();
 	}
-
-	//// Game Loop ////
-
-	// init graphics, keybaord, cpu
-
-	// load game and sprites or whatever
-
-	// loop
-
-		// emulate a cycle
-		// render if needed
-		// store key press
 
 	SDL_Quit();
 

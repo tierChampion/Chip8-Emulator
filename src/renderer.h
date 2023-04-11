@@ -2,11 +2,12 @@
 
 #include <SDL/SDL.h>
 #include <cstdint>
+#include <iostream>
 
 namespace ch8 {
 
-#define CHIP8_SCREEN_W 16
-#define CHIP8_SCREEN_H 8
+#define CHIP8_SCREEN_W 64
+#define CHIP8_SCREEN_H 32
 
 	/*
 	Visual system of the Chip8
@@ -14,7 +15,6 @@ namespace ch8 {
 	class Renderer {
 
 		uint8_t			_screen[CHIP8_SCREEN_W * CHIP8_SCREEN_H];	// Screen raster
-		uint32_t		_frame_start;								// Start of the last frame
 
 		SDL_Renderer*	_renderer;									// Rendering object
 		SDL_Window*		_window;									// Window object
@@ -22,7 +22,7 @@ namespace ch8 {
 
 	public:
 
-		Renderer(uint8_t scale);
+		Renderer();
 
 		~Renderer();
 

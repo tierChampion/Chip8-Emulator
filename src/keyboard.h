@@ -48,6 +48,7 @@ namespace ch8 {
 		bool isPressed(uint8_t keycode) const;
 
 		bool isWaiting() const;
+		uint8_t getWaited() const;
 		void wait();
 
 		friend std::ostream& operator<<(std::ostream& os, const Keyboard& kb);

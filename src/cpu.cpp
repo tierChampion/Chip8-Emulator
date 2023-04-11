@@ -15,6 +15,7 @@ namespace ch8 {
 		_SP = 0;
 		_delay_timer = 0;
 		_audio_timer = 0;
+		_frame_start = SDL_GetTicks();
 
 		// Init registers and stack
 		for (int i = 0; i < 16; i++) {
@@ -26,6 +27,12 @@ namespace ch8 {
 		for (int i = 0; i < 80; i++) {
 			_memory[i] = _CHIP8_FONTSET[i];
 		}
+	}
+
+	bool Cpu::needToDraw() {
+		bool temp = _draw_flag;
+		_draw_flag = false;
+		return temp;
 	}
 
 	/**
@@ -60,101 +67,28 @@ namespace ch8 {
 
 	void Cpu::cycle() {
 
-		// Fetch the next opcode. Stored in Big Endian.
+		// Ensure a 60 Hz clock speed for the timers
+		uint32_t current_time = SDL_GetTicks();
+		if (current_time - _frame_start < CHIP8_CLOCK_SPEED) {
+			SDL_Delay(CHIP8_CLOCK_SPEED - (current_time - _frame_start));
+		}
 
+		_frame_start = SDL_GetTicks();
+
+		// Fetch the next opcode. Stored in Big Endian.
 		_opcode = _memory[_PC] << 8 | _memory[_PC + 1];
 
-		// decode the opcode and execute it
-
-		switch (_opcode & 0xF000) {
-
-		case 0x2000: { // Calls a subroutine
-
-			// Keep the current in the stack
-			_stack[_SP] = _PC;
-			_SP++;
-			// Move to the subroutine
-			_PC = _nnn();
-
-			break;
-		}
-
-		case 0x6000: {	// Store a value in a specific register
-
-			uint8_t register_id = _x();
-			uint8_t val = _nn();
-
-			_V[_x()] = _nn();
-			_PC += 2;
-
-			break;
-		}
-
-		case 0xA000: {	// Store a value in the address register
-
-			_I = _nnn();
-			_PC += 2;
-
-			break;
-		}
-
-		case 0xD000: { // Draw a sprite at a specific location
-
-			// TODO...
-
-			_PC += 2;
-
-			break;
-		}
-
-		case 0xF000: { // Miscellanious operations
-
-			switch (_opcode & 0xF0FF) {
-
-			case 0xF033: { // Stores the BCD representation of a value
-
-				uint16_t val = _V[_n()];
-
-				_memory[_I] = val / 100;
-
-				_memory[_I + 1] = (val / 10) % 10;
-
-				_memory[_I + 2] = val % 10;
-
-				break;
-			}
-
-			default: {
-				std::cerr << "Unknown Opcode encountered: " << std::hex << _opcode << std::endl;
-			}
-			}
-
-			break;
-		}
-
-		default: {
-
-			std::cerr << "Unknown Opcode encountered: " << std::hex << _opcode << std::endl;
-		}
-
-		}
-	}
-
-	void Cpu::test_cycle(uint16_t opcode) {
-
-		// Fetch the next opcode. Stored in Big Endian.
-
-		_opcode = opcode;
+		// std::cout << std::hex << _opcode << std::endl;
 
 		// decode the opcode and execute it
-
 		switch (_opcode & 0xF000) {
 
 		case 0x0000: {
 			switch (_opcode & 0x00FF) {
 			case 0x00E0: {	// Clears the screen
 
-				// TODO...
+				_visuals.clearScreen();
+				_draw_flag = true;
 
 				_PC += 2;
 
@@ -164,6 +98,8 @@ namespace ch8 {
 
 				_SP--;
 				_PC = _stack[_SP];
+
+				_PC += 2;
 
 				break;
 			}
@@ -245,6 +181,7 @@ namespace ch8 {
 		case 0x7000: {	// Addition without carry
 
 			_V[_x()] += _nn();
+
 			_PC += 2;
 
 			break;
@@ -258,12 +195,16 @@ namespace ch8 {
 
 				_V[_x()] = _V[_y()];
 
+				_PC += 2;
+
 				break;
 			}
 
 			case 0x8001: {	// Bitwise OR
 
 				_V[_x()] |= _V[_y()];
+
+				_PC += 2;
 
 				break;
 			}
@@ -272,12 +213,16 @@ namespace ch8 {
 
 				_V[_x()] &= _V[_y()];
 
+				_PC += 2;
+
 				break;
 			}
 
 			case 0x8003: {	// Bitwise XOR
 
 				_V[_x()] ^= _V[_y()];
+
+				_PC += 2;
 
 				break;
 			}
@@ -291,6 +236,8 @@ namespace ch8 {
 
 				_V[_x()] = sum;
 
+				_PC += 2;
+
 				break;
 			}
 
@@ -300,6 +247,8 @@ namespace ch8 {
 				_V[0xF] = (_V[_y()] <= _V[_x()]);
 
 				_V[_x()] = _V[_x()] - _V[_y()];
+
+				_PC += 2;
 
 				break;
 			}
@@ -311,6 +260,8 @@ namespace ch8 {
 
 				_V[_x()] >>= 1;
 
+				_PC += 2;
+
 				break;
 			}
 
@@ -321,6 +272,8 @@ namespace ch8 {
 
 				_V[_x()] = _V[_y()] - _V[_x()];
 
+				_PC += 2;
+
 				break;
 			}
 
@@ -330,6 +283,8 @@ namespace ch8 {
 				_V[0xF] = _V[_x()] & 0x80;
 
 				_V[_x()] <<= 1;
+
+				_PC += 2;
 
 				break;
 			}
@@ -364,14 +319,30 @@ namespace ch8 {
 
 			_V[_n()] = random & _nn();
 
+			_PC += 2;
+
 			break;
 		}
 
 		case 0xD000: { // Draw a sprite at a specific location
 
-			// TODO...
+			for (int i = 0; i < _n(); i++) {
+
+				// Get the row of pixels to render
+				uint8_t row = _memory[_I + i];
+
+				for (int j = 0; j < 8; j++) {
+
+					// If bit will change the pixel
+					if (row & (1 << (7 - j))) {
+						_V[0xF] &= _visuals.setPixel(_V[_x()] + j, _V[_y()] + i);
+					}
+				}
+			}
 
 			_PC += 2;
+
+			_draw_flag = true;
 
 			break;
 		}
@@ -380,13 +351,21 @@ namespace ch8 {
 
 			switch (_opcode & 0xE0FF) {
 
-			case 0xE09E: {
-				// TODO...
+			case 0xE09E: { // Skip next instruction if key is pressed
+
+				if (_inputs.isPressed(_V[_x()])) _PC += 2;
+
+				_PC += 2;
+
 				break;
 			}
 
-			case 0xE0A1: {
-				// TODO...
+			case 0xE0A1: { // Skip next instruction if key is not pressed
+
+				if (!_inputs.isPressed(_V[_x()])) _PC += 2;
+
+				_PC += 2;
+
 				break;
 			}
 
@@ -406,12 +385,23 @@ namespace ch8 {
 
 				_V[_x()] = _delay_timer;
 
+				_PC += 2;
+
 				break;
 			}
 
 			case 0xF00A: {	// Await key press
 
-				// TODO...
+				if (!_wait_flag) {
+					_inputs.wait();
+					_wait_flag = true;
+				}
+				// Received a new input
+				else if (!_inputs.isWaiting()) {
+					_V[_x()] = _inputs.getWaited();
+
+					_PC += 2;
+				}
 
 				break;
 			}
@@ -420,12 +410,16 @@ namespace ch8 {
 
 				_delay_timer = _V[_x()];
 
+				_PC += 2;
+
 				break;
 			}
 
 			case 0xF018: {	// Sound timer setter
 
 				_audio_timer = _V[_x()];
+
+				_PC += 2;
 
 				break;
 
@@ -435,13 +429,18 @@ namespace ch8 {
 
 				_I += _V[_x()];
 
+				_PC += 2;
+
 				break;
 
 			}
 
 			case 0xF029: {	// Store sprite data
 
-				// TODO...
+				// Location of hex character # in memory is 10 * #
+				_I = 10 * _V[_x()];
+
+				_PC += 2;
 
 				break;
 			}
@@ -466,6 +465,8 @@ namespace ch8 {
 					_memory[_I + i] = _V[i];
 				}
 
+				_PC += 2;
+
 				break;
 			}
 
@@ -475,6 +476,8 @@ namespace ch8 {
 
 					_V[i] = _memory[_I + i];
 				}
+
+				_PC += 2;
 
 				break;
 			}
@@ -493,5 +496,20 @@ namespace ch8 {
 		}
 
 		}
+
+		// Update the delay timer
+		if (_delay_timer > 0) _delay_timer--;
+
+		// Update the audio timer
+		if (_audio_timer > 0) {
+			if (_audio_timer == 1) {
+				// TODO
+				std::cout << "BEEP!" << std::endl;
+			}
+
+			_audio_timer--;
+		}
+
 	}
+
 }
