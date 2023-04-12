@@ -96,7 +96,7 @@ namespace ch8 {
 			}
 			case 0x00EE: {	// Return from a subroutine
 
-				_SP--;
+				_SP--; // TODO Possible underflow? 
 				_PC = _stack[_SP];
 
 				_PC += 2;
@@ -204,6 +204,8 @@ namespace ch8 {
 
 				_V[_x()] |= _V[_y()];
 
+				_V[0xF] = 0;
+
 				_PC += 2;
 
 				break;
@@ -213,6 +215,7 @@ namespace ch8 {
 
 				_V[_x()] &= _V[_y()];
 
+				_V[0xF] = 0;
 				_PC += 2;
 
 				break;
@@ -222,6 +225,7 @@ namespace ch8 {
 
 				_V[_x()] ^= _V[_y()];
 
+				_V[0xF] = 0;
 				_PC += 2;
 
 				break;
@@ -232,9 +236,11 @@ namespace ch8 {
 				uint16_t sum = _V[_x()] + _V[_y()];
 
 				// Detection for overflow
-				_V[0xF] = (sum > 0xFF);
+				uint8_t overflow = (sum > 0xFF);
 
 				_V[_x()] = sum;
+
+				_V[0xF] = overflow;
 
 				_PC += 2;
 
@@ -244,9 +250,11 @@ namespace ch8 {
 			case 0x8005: {	// Substraction
 
 				// Detection for underflow (0 when there is)
-				_V[0xF] = (_V[_y()] <= _V[_x()]);
+				uint8_t underflow = (_V[_y()] <= _V[_x()]);
 
 				_V[_x()] = _V[_x()] - _V[_y()];
+
+				_V[0xF] = underflow;
 
 				_PC += 2;
 
@@ -255,10 +263,14 @@ namespace ch8 {
 
 			case 0x8006: {	// Right shift, stores extra bit
 
+				_V[_x()] = _V[_y()]; // Hold quirk
+
 				// Extra crushed bit
-				_V[0xF] = _V[_x()] & 0x1;
+				uint8_t carry = _V[_x()] & 0x1;
 
 				_V[_x()] >>= 1;
+
+				_V[0xF] = carry;
 
 				_PC += 2;
 
@@ -268,9 +280,11 @@ namespace ch8 {
 			case 0x8007: {	// Inverse substraction
 
 				// Detection for underflow (0 when there is)
-				_V[0xF] = (_V[_x()] <= _V[_y()]);
+				uint8_t underflow = (_V[_x()] <= _V[_y()]);
 
 				_V[_x()] = _V[_y()] - _V[_x()];
+
+				_V[0xF] = underflow;
 
 				_PC += 2;
 
@@ -279,10 +293,14 @@ namespace ch8 {
 
 			case 0x800E: {	// Left shift, stores extra bit
 
+				_V[_x()] = _V[_y()]; // Hold quirk
+
 				// Extra crushed bit
-				_V[0xF] = _V[_x()] & 0x80;
+				uint8_t carry = (_V[_x()] & 0x80) >> 7;
 
 				_V[_x()] <<= 1;
+
+				_V[0xF] = carry;
 
 				_PC += 2;
 
@@ -317,14 +335,14 @@ namespace ch8 {
 			// Random number between 0 and 255.
 			uint8_t random = rand() % 0x100;
 
-			_V[_n()] = random & _nn();
+			_V[_x()] = random & _nn();
 
 			_PC += 2;
 
 			break;
 		}
 
-		case 0xD000: { // Draw a sprite at a specific location
+		case 0xD000: { // Draw a sprite at a specific location : TODO
 
 			_V[0xF] = 0;
 
@@ -337,7 +355,8 @@ namespace ch8 {
 
 					// If bit will change the pixel
 					if (row & (1 << (7 - j))) {
-						_V[0xF] &= _visuals.setPixel(_V[_x()] + j, _V[_y()] + i);
+						_V[0xF] &= _visuals.setPixel((_V[_x()] % CHIP8_SCREEN_W) + j,
+							(_V[_y()] % CHIP8_SCREEN_H) + i);
 					}
 				}
 			}
@@ -440,7 +459,7 @@ namespace ch8 {
 			case 0xF029: {	// Store sprite data
 
 				// Location of hex character # in memory is 10 * #
-				_I = 10 * _V[_x()];
+				_I = 5 * _V[_x()];
 
 				_PC += 2;
 
@@ -462,10 +481,12 @@ namespace ch8 {
 
 			case 0xF055: {	// Store registers 0 to x in memory
 
-				for (uint8_t i = 0; i < _x(); i++) {
+				for (uint8_t i = 0; i < _x() + 1; i++) {
 
 					_memory[_I + i] = _V[i];
 				}
+
+				_I += _x() + 1; // Simulate the old hardware
 
 				_PC += 2;
 
@@ -474,10 +495,12 @@ namespace ch8 {
 
 			case 0xF065: {	// Load registers 0 to x from memory
 
-				for (uint8_t i = 0; i < _x(); i++) {
+				for (uint8_t i = 0; i < _x() + 1; i++) {
 
 					_V[i] = _memory[_I + i];
 				}
+
+				_I += _x() + 1; // Simulate the old hardware
 
 				_PC += 2;
 

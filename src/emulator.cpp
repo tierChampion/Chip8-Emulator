@@ -7,6 +7,8 @@ using namespace ch8;
 
 int main(int argc, char* argv[]) {
 
+	// TODO: Fix clipping and waiting in DXYN op.
+
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 
 		std::cerr << "Couldn't initialize SDL: " << SDL_GetError() << std::endl;
@@ -15,7 +17,7 @@ int main(int argc, char* argv[]) {
 
 	Cpu cpu;
 
-	bool res = cpu.loadProgram("roms/PONG");
+	bool res = cpu.loadProgram("roms/tests/5-quirks.ch8");
 
 	if (!res) return -1;
 

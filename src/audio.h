@@ -10,7 +10,7 @@ namespace ch8 {
 	*/
 	class Audio {
 
-		static constexpr float	_AMPLITUDE = 40000;
+		static constexpr float	_AMPLITUDE = 30000;
 		static constexpr int	_SAMPLING_FREQ = 48000;
 
 
