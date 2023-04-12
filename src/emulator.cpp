@@ -7,7 +7,12 @@ using namespace ch8;
 
 int main(int argc, char* argv[]) {
 
-	// TODO: Fix clipping and waiting in DXYN op.
+	// TODO:
+	// - Make a more accurate timer with SDL_GetPerformanceCounter() and SDL_GetPerformanceFrequency()
+	//	https://wiki.libsdl.org/SDL2/SDL_GetPerformanceCounter
+	// - Make the Audio, Keyboard and Renderer classes purely static
+	// - More error detection for SDL calls
+	// - Maybe switch to CMake to support linux?
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 
@@ -17,7 +22,7 @@ int main(int argc, char* argv[]) {
 
 	Cpu cpu;
 
-	bool res = cpu.loadProgram("roms/tests/5-quirks.ch8");
+	bool res = cpu.loadProgram("roms/PONG");
 
 	if (!res) return -1;
 

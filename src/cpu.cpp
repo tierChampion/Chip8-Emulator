@@ -355,7 +355,7 @@ namespace ch8 {
 
 					// If bit will change the pixel
 					if (row & (1 << (7 - j))) {
-						_V[0xF] &= _visuals.setPixel((_V[_x()] % CHIP8_SCREEN_W) + j,
+						_V[0xF] |= _visuals.setPixel((_V[_x()] % CHIP8_SCREEN_W) + j,
 							(_V[_y()] % CHIP8_SCREEN_H) + i);
 					}
 				}
