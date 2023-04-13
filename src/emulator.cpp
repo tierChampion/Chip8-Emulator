@@ -8,9 +8,6 @@ using namespace ch8;
 int main(int argc, char* argv[]) {
 
 	// TODO:
-	// - Make a more accurate timer with SDL_GetPerformanceCounter() and SDL_GetPerformanceFrequency()
-	//	https://wiki.libsdl.org/SDL2/SDL_GetPerformanceCounter
-	// - Make the Audio, Keyboard and Renderer classes purely static
 	// - More error detection for SDL calls
 	// - Maybe switch to CMake to support linux?
 

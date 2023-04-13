@@ -36,7 +36,7 @@ namespace ch8 {
 
 		uint8_t		_keys[CHIP8_KEY_COUNT];		// States of the keys
 		uint8_t		_awaited_key;	// Index of the first inputed key after waiting
-		bool		_waiting;		// State if waiting for a key press
+		bool		_waiting;		// State of waiting for a key press
 
 	public:
 

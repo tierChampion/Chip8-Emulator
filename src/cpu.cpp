@@ -67,7 +67,7 @@ namespace ch8 {
 
 	void Cpu::cycle() {
 
-		// Ensure a 60 Hz clock speed for the timers
+		// Ensure the proper clock speed for the timers
 		uint32_t current_time = SDL_GetTicks();
 		if (current_time - _frame_start < CHIP8_TICKS_PER_FRAME) {
 			SDL_Delay(CHIP8_TICKS_PER_FRAME - (current_time - _frame_start));
@@ -77,8 +77,6 @@ namespace ch8 {
 
 		// Fetch the next opcode. Stored in Big Endian.
 		_opcode = _memory[_PC] << 8 | _memory[_PC + 1];
-
-		// std::cout << std::hex << _opcode << std::endl;
 
 		// decode the opcode and execute it
 		switch (_opcode & 0xF000) {
@@ -528,11 +526,10 @@ namespace ch8 {
 
 		// Update the audio timer
 		if (_audio_timer > 0) {
-			std::cout << +_audio_timer << std::endl;
-			_audio.playFrequency(440);
+			Audio::playFrequency(440);
 		}
 		else if (_audio_timer == 0) {
-			_audio.stop();
+			Audio::stop();
 		}
 	}
 }
