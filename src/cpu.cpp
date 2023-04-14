@@ -236,7 +236,7 @@ namespace ch8 {
 				// Detection for overflow
 				uint8_t overflow = (sum > 0xFF);
 
-				_V[_x()] = sum;
+				_V[_x()] = (uint8_t)sum;
 
 				_V[0xF] = overflow;
 

@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include <iostream>
 #include <map>
-#include <SDL/SDL.h>
+#include "../include/SDL/SDL.h"
 
 namespace ch8 {
 

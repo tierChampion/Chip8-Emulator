@@ -40,18 +40,18 @@ namespace ch8 {
 	* @param x - Horizontal position of the pixel
 	* @param y - Vertical position of the pixel
 	*/
-	bool Renderer::setPixel(uint8_t x, uint8_t y) {
+	uint8_t Renderer::setPixel(uint8_t x, uint8_t y) {
 
 		// Check if within bounds
 		if ((int)x >= CHIP8_SCREEN_W || (int)y >= CHIP8_SCREEN_H) {
-			return false;
+			return 0x00;
 		}
 
 		// XOR the new pixel
 		_screen[y * CHIP8_SCREEN_W + x] ^= 0xFF;
 
 		// Return if the pixel was turned off
-		return _screen[y * CHIP8_SCREEN_W + x] == 0x0;
+		return (uint8_t)(_screen[y * CHIP8_SCREEN_W + x] == 0x0);
 	}
 
 	/**

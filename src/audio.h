@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL/SDL.h>
+#include "../include/SDL/SDL.h"
 #include <cstdint>
 
 namespace ch8 {
@@ -23,11 +23,12 @@ namespace ch8 {
 
 	public:
 
-
 		static void audioCallback(void* userData, uint8_t* stream, int len);
 
 		static void playFrequency(float freq);
 		static void stop();
+
+		static void closeAudio();
 	};
 
 	struct AudioState {
@@ -56,5 +57,4 @@ namespace ch8 {
 			}
 		}
 	};
-
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL/SDL.h>
+#include "../include/SDL/SDL.h"
 #include <cstdint>
 #include <iostream>
 
@@ -27,7 +27,7 @@ namespace ch8 {
 		~Renderer();
 
 		void clearScreen();
-		bool setPixel(uint8_t x, uint8_t y);
+		uint8_t setPixel(uint8_t x, uint8_t y);
 		void render();
 
 	};

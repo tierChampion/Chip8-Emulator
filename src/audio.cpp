@@ -26,4 +26,8 @@ namespace ch8 {
 			if (Audio::_time >= 2 * M_PI) Audio::_time -= 2 * M_PI;
 		}
 	}
+
+	void Audio::closeAudio() {
+		SDL_CloseAudioDevice(_state._deviceId);
+	}
 }
