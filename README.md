@@ -1,1 +1,3 @@
-# Chip8-Emulator
+# OctoChip
+
+OctoChip is a Chip8 Emulator.
