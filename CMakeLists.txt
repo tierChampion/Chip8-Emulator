@@ -17,6 +17,8 @@ if (${IS_DEBUG_BUILD})
 	add_compile_definitions(__DEBUG__)
 endif()
 
+add_definitions(-DDIRECTORY_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}\")
+
 set(SDL2_DIR "libs")
 
 find_package(SDL2 REQUIRED)

@@ -57,7 +57,7 @@ namespace ch8 {
 		}
 		else {
 
-			std::perror("Failed to open the program");
+			std::cerr << "Error: Couldn't open the provided ROM -> " << rom_path << std::endl;
 
 			return false;
 		}
@@ -94,7 +94,7 @@ namespace ch8 {
 			}
 			case 0x00EE: {	// Return from a subroutine
 
-				_SP--; // TODO Possible underflow? 
+				_SP--;
 				_PC = _stack[_SP];
 
 				_PC += 2;
@@ -340,7 +340,7 @@ namespace ch8 {
 			break;
 		}
 
-		case 0xD000: { // Draw a sprite at a specific location : TODO
+		case 0xD000: {
 
 			_V[0xF] = 0;
 

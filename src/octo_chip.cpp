@@ -1,25 +1,10 @@
-﻿// OctoChip.cpp : Defines the entry point for the application.
-//
-
+﻿
 #include "octo_chip.h"
 
 using namespace ch8;
 
-std::string getProjectDirectory(std::string exe_path) {
-
-#ifdef __DEBUG__
-	return exe_path.substr(0, exe_path.length() - std::string("out\\build\\x##-Debug\\bin\\OctoChip.exe").length());
-#else
-	return exe_path.substr(0, exe_path.length() - std::string("out\\build\\x##-Release\\bin\\OctoChip.exe").length());
-#endif
-}
-
 int main(int argc, char* argv[])
 {
-	// TODO:
-		// - More error detection for SDL calls
-
-	std::string project_path = getProjectDirectory(argv[0]);
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 
@@ -29,12 +14,18 @@ int main(int argc, char* argv[])
 
 	Cpu cpu;
 
-	bool res = cpu.loadProgram((project_path + std::string("\\roms\\PONG")).c_str());
+	// Name of the rom to load. Default is PONG
+	std::string rom = "PONG";
 
-	if (!res) return -1;
+	if (argc > 1) {
+		rom = std::string(argv[1]);
+	}
+
+	if (!cpu.loadProgram((std::string(DIRECTORY_PATH) + std::string("\\roms\\") + rom).c_str())) {
+		return -1;
+	}
 
 	SDL_Event event;
-
 	bool quit = false;
 
 	while (!quit) {
@@ -57,7 +48,6 @@ int main(int argc, char* argv[])
 	}
 
 	Audio::closeAudio();
-
 	SDL_Quit();
 
 	return 0;
